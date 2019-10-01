@@ -47,7 +47,7 @@ server.get('/api/users/:id', (req, res) => {
         if (!user) {
           res
             .status(404)
-            .json({ error: 'The user with the specified ID does not exist.' });
+            .json({ message: 'The user with the specified ID does not exist.' });
         } else {
           res.json(user);
         }
@@ -68,12 +68,42 @@ server.get('/api/users/:id', (req, res) => {
           if (!user) {
             res
               .status(404)
-              .json({ error: 'The user with the specified ID does not exist.' });
+              .json({ message: 'The user with the specified ID does not exist.' });
           } else {
             res.json(user);
           }
         })
-        .catch();
+        .catch(err =>
+            res.status(500).json({ error: 'The user could not be removed.' }),
+          );
+      });
+      
+      server.put('/api/users/:id', (req, res) => {
+        const id = req.params.id;
+        const changes = req.body;
+      
+        if (!changes.name || !changes.bio) {
+          res
+            .status(400)
+            .json({ errorMessage: 'Please provide name and bio for the user.' });
+        } else {
+          users
+            .update(id, changes)
+            .then(user => {
+              if (!user) {
+                res.status(404).json({
+                  message: 'The user with the specified ID does not exist.',
+                });
+              } else {
+                res.status(200).json(user);
+              }
+            })
+            .catch(err =>
+              res
+                .status(500)
+                .json({ error: 'The user information could not be modified' }),
+            );
+        }
   });
   
 const port = 8000;
