@@ -19,9 +19,7 @@ server.post('/api/users', (req, res) => {
       .insert(userData)
       .then(user => res.status(201).json(user))
       .catch(err =>
-        res
-          .status(400)
-          .json({
+        res.status(400).json({
             error: 'There was an error while saving the user to the database.',
           }),
       );
@@ -40,5 +38,32 @@ server.get('/api/users', (req, res) => {
     );
 });
 
+server.get('/api/users/:id', (req, res) => {
+    const id = req.params.id;
+  
+    // if (false) {
+    //   res
+    //     .status(404)
+    //     .json({ error: 'The user with the specified ID does not exist.' });
+    // } else {
+    users
+      .findById(id)
+      .then(user => {
+        if (!user) {
+          res
+            .status(404)
+            .json({ error: 'The user with the specified ID does not exist.' });
+        } else {
+          res.send(user);
+        }
+      })
+      .catch(err =>
+        res
+          .status(500)
+          .json({ error: 'The user information could not be retrieved.' }),
+      );
+    // }
+  });
+  
 const port = 8000;
 server.listen(port, () => console.log(`\n**API on port ${port} **\n`));
