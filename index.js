@@ -5,15 +5,39 @@ const users = require('./data/db');
 
 const server = express();
 
+server.use(express.json());
+
+server.post('/api/users', (req, res) => {
+  const userData = req.body;
+
+  if (!userData.name || !userData.bio) {
+    res
+      .status(400)
+      .json({ errorMessage: 'Please provide name and bio for the user.' });
+  } else {
+    users
+      .insert(userData)
+      .then(user => res.status(201).json(user))
+      .catch(err =>
+        res
+          .status(400)
+          .json({
+            error: 'There was an error while saving the user to the database.',
+          }),
+      );
+  }
+});
+
+
 server.get('/api/users', (req, res) => {
   users
     .find()
     .then(users => res.send(users))
-    .catch(err => {
+    .catch(err =>
       res
         .status(500)
-        .json({ error: 'The users information could not be retrieved.' });
-    });
+        .json({ error: 'The users information could not be retrieved.' }),
+    );
 });
 
 const port = 8000;
